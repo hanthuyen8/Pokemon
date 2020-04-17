@@ -14,23 +14,13 @@ namespace Game
         public static event System.Action PlayerConfirm;
         
         public ItemType Type;
-        public Block InsideThisBlock
-        {
-            get => _insideThisBlock;
-            set
-            {
-                _insideThisBlock = value;
-                if (value)
-                    value.IsEmpty = false;
-            }
-        }
+        public Block InsideThisBlock { get; private set; }
 
         [SerializeField] private SpriteRenderer _avatar = null;
         [SerializeField] private SpriteRenderer _shadow = null;
 
         private static bool _isMouseDown = false;
         private bool _isChosen = false;
-        private Block _insideThisBlock;
 
         private void Awake()
         {
@@ -43,16 +33,27 @@ namespace Game
         private void Start()
         {
             _avatar.sprite = Type.Img;
-
-            var blockPos = InsideThisBlock.transform.localPosition;
-            transform.localPosition = new Vector3(blockPos.x, 20, -1);
-            transform.DOLocalMoveY(blockPos.y, 1f);
         }
 
         public static void ReleaseAll()
         {
             _isMouseDown = false;
         }
+
+        public void MoveToBlock(Block block)
+        {
+            var blockPos = block.transform.localPosition;
+            if (InsideThisBlock == null)
+            {
+                transform.localPosition = new Vector3(blockPos.x, 20, -1);
+            }
+
+            InsideThisBlock = block;
+            InsideThisBlock.KeepThisItem(this);
+
+            transform.DOLocalMoveY(blockPos.y, 1f);
+        }
+
         public void ChooseThisItem()
         {
             _isChosen = true;
@@ -67,7 +68,7 @@ namespace Game
 
         public void RemoveThisItem()
         {
-            _insideThisBlock.IsEmpty = true;
+            InsideThisBlock.RemoveItem();
             Destroy(this);
         }
 

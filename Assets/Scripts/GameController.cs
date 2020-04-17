@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Sirenix.OdinInspector;
+using System.Linq;
 
 namespace Game
 {
@@ -87,9 +88,7 @@ namespace Game
 
             Item.ReleaseAll();
 
-
-            // Tiếp theo là cho các Item mới điền vào chỗ trống, rơi từ trên trời xuống
-            board.SpawnNewItemIntoBlocks(emptyBlocks);
+            SendSortedBlocksToSpawnNewItems(emptyBlocks);
         }
 
         private bool IsTheSameId(Item item1, Item item2)
@@ -105,7 +104,22 @@ namespace Game
                 return false;
 
             return true;
+        }
 
+        private void SendSortedBlocksToSpawnNewItems(List<Block> blocks)
+        {
+            var columns = blocks.GroupBy(x => x.AtColumn);
+
+            foreach(var group in columns)
+            {
+                var sorted = group.OrderByDescending(x => x.AtRow);
+                Queue<Block> queue = new Queue<Block>();
+                foreach(var item in sorted)
+                {
+                    queue.Enqueue(item);
+                }
+                board.FillTheEmptyBlocks(queue);
+            }
         }
     }
 

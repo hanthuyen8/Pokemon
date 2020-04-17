@@ -236,8 +236,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f71d0b78ab288384eb51d34f5032598c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlockId: {x: 2, y: 0}
-  IsEmpty: 0
+  IsForbidden: 0
+  _atColumn: 2
+  _atRow: 0
 --- !u!212 &442221846
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -415,8 +416,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f71d0b78ab288384eb51d34f5032598c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlockId: {x: 1, y: 0}
-  IsEmpty: 0
+  IsForbidden: 0
+  _atColumn: 1
+  _atRow: 0
 --- !u!212 &617343525
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -497,8 +499,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f71d0b78ab288384eb51d34f5032598c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlockId: {x: 0, y: 2}
-  IsEmpty: 0
+  IsForbidden: 0
+  _atColumn: 0
+  _atRow: 2
 --- !u!212 &926628045
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -607,8 +610,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f71d0b78ab288384eb51d34f5032598c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlockId: {x: 2, y: 1}
-  IsEmpty: 0
+  IsForbidden: 0
+  _atColumn: 2
+  _atRow: 1
 --- !u!212 &926906812
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -689,8 +693,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f71d0b78ab288384eb51d34f5032598c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlockId: {x: 1, y: 2}
-  IsEmpty: 0
+  IsForbidden: 0
+  _atColumn: 1
+  _atRow: 2
 --- !u!212 &1003141428
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -799,8 +804,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f71d0b78ab288384eb51d34f5032598c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlockId: {x: 0, y: 1}
-  IsEmpty: 0
+  IsForbidden: 0
+  _atColumn: 0
+  _atRow: 1
 --- !u!212 &1153198659
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -895,8 +901,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f71d0b78ab288384eb51d34f5032598c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlockId: {x: 1, y: 1}
-  IsEmpty: 0
+  IsForbidden: 0
+  _atColumn: 1
+  _atRow: 1
 --- !u!212 &1298581271
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1021,8 +1028,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f71d0b78ab288384eb51d34f5032598c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlockId: {x: 2, y: 2}
-  IsEmpty: 0
+  IsForbidden: 0
+  _atColumn: 2
+  _atRow: 2
 --- !u!212 &1563047369
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1131,8 +1139,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f71d0b78ab288384eb51d34f5032598c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlockId: {x: 0, y: 0}
-  IsEmpty: 0
+  IsForbidden: 0
+  _atColumn: 0
+  _atRow: 0
 --- !u!212 &1989550841
 SpriteRenderer:
   m_ObjectHideFlags: 0
