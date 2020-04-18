@@ -10,9 +10,9 @@ namespace Game
     [RequireComponent(typeof(BoxCollider2D))]
     public class Item : MonoBehaviour
     {
-        public static event System.Action<Item> PlayerChooseThisItem;
+        public static event System.Action<Item> PlayerWantToChooseThisItem;
         public static event System.Action PlayerConfirm;
-        
+
         public ItemType Type;
         public Block InsideThisBlock { get; private set; }
 
@@ -22,17 +22,24 @@ namespace Game
         private static bool _isMouseDown = false;
         private bool _isChosen = false;
 
+
         private void Awake()
         {
             Assert.IsNotNull(_avatar);
             Assert.IsNotNull(_shadow);
 
+            PlayerWantToChooseThisItem += Item_PlayerWantToChooseThisItem;
             _shadow.enabled = false;
         }
 
         private void Start()
         {
             _avatar.sprite = Type.Img;
+        }
+
+        private void OnDestroy()
+        {
+            PlayerWantToChooseThisItem -= Item_PlayerWantToChooseThisItem;
         }
 
         public static void ReleaseAll()
@@ -54,6 +61,17 @@ namespace Game
             transform.DOLocalMoveY(blockPos.y, 1f);
         }
 
+        public bool LevelUp()
+        {
+            if (Type.NextLevel)
+            {
+                Type = Type.NextLevel;
+                _avatar.sprite = Type.Img;
+                return true;
+            }
+            return false;
+        }
+
         public void ChooseThisItem()
         {
             _isChosen = true;
@@ -72,12 +90,32 @@ namespace Game
             Destroy(this);
         }
 
+        #region Flashing
+        private Tween _flashing;
+
+        public void Flash()
+        {
+            _shadow.enabled = true;
+            _flashing = _shadow.DOFade(0.5f, 0.3f).SetLoops(8, LoopType.Yoyo).OnComplete(() => _shadow.enabled = false);
+        }
+
+        private void Item_PlayerWantToChooseThisItem(Item current)
+        {
+            _flashing?.Kill();
+            _shadow.enabled = _isChosen;
+            var color = _shadow.color;
+            color.a = 1;
+            _shadow.color = color;
+        }
+        #endregion
+
+        #region MouseInput
         private void OnMouseDown()
         {
             _isMouseDown = true;
             _isChosen = true;
 
-            PlayerChooseThisItem?.Invoke(this);
+            PlayerWantToChooseThisItem?.Invoke(this);
         }
 
         private void OnMouseOver()
@@ -89,7 +127,7 @@ namespace Game
                 return;
 
             _isChosen = true;
-            PlayerChooseThisItem?.Invoke(this);
+            PlayerWantToChooseThisItem?.Invoke(this);
         }
 
         private void OnMouseUp()
@@ -97,6 +135,7 @@ namespace Game
             _isMouseDown = false;
             PlayerConfirm?.Invoke();
         }
+        #endregion
 
     }
 

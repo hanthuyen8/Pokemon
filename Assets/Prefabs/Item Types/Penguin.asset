@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Id: Penguin
   Img: {fileID: 21300000, guid: 8b3fdc5dbc2bb1e4b8e60022e105c847, type: 3}
+  NextLevel: {fileID: 11400000, guid: 7ac2432d9b7464746aaf3180a59ab9d2, type: 2}

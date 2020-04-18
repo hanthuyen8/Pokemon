@@ -7,6 +7,8 @@ namespace Game
 {
     public class Board : MonoBehaviour
     {
+        public static Board Instance { get; private set; }
+
         [SerializeField] private int _maxCol = 5;
         [SerializeField] private float _blockSize = 1;
 
@@ -24,7 +26,19 @@ namespace Game
 
         private void Awake()
         {
-            _blockArrays = new Block[_maxCol, Mathf.CeilToInt(_allBlocks.Count / _maxCol)];
+            if(!Instance)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Destroy(this);
+                return;
+            }
+
+            Block.ABlockReady += Block_ABlockReady;
+
+            _blockArrays = new Block[_maxCol, Mathf.CeilToInt(_allBlocks.Count / (float)_maxCol)];
             int col = 0, row = 0;
             for (int i = 0; i < _allBlocks.Count; i++)
             {
@@ -34,6 +48,9 @@ namespace Game
                     row++;
                 }
 
+                if (i >= _allBlocks.Count)
+                    break;
+
                 _blockArrays[col, row] = _allBlocks[i];
                 col++;
             }
@@ -42,6 +59,24 @@ namespace Game
         private void Start()
         {
             SpawnNewItemIntoBlocks(_allBlocks);
+        }
+
+        private void OnDestroy()
+        {
+            Block.ABlockReady -= Block_ABlockReady;
+        }
+
+        public bool IsThisBlockExist(int atColumn, int atRow, out Block result)
+        {
+            if (atColumn < 0 || atRow < 0 || 
+                atColumn >= _blockArrays.GetLength(0) || atRow >= _blockArrays.GetLength(1))
+            {
+                result = null;
+                return false;
+            }
+
+            result = _blockArrays[atColumn, atRow];
+            return result != null;
         }
 
         public void SpawnNewItemIntoBlocks(List<Block> emptyBlocks)
@@ -56,7 +91,7 @@ namespace Game
         public void FillTheEmptyBlocks(Queue<Block> emptyBlocks)
         {
             // List nhập vào phải được sắp xếp theo thứ tự rồi.
-            while(emptyBlocks.Count > 0)
+            while (emptyBlocks.Count > 0)
             {
                 var block = emptyBlocks.Dequeue();
                 var upperRow = block.AtRow - 1;
@@ -80,13 +115,18 @@ namespace Game
                         continue;
                     }
                 }
-                if(!added)
+                if (!added)
                 {
                     // Không còn block nào phía trên đầu nữa. Tạo Item mới.
                     Item item = AddNewItem();
                     item.MoveToBlock(block);
                 }
             }
+        }
+
+        public Block[,] GetArray()
+        {
+            return _blockArrays;
         }
 
         private Item AddNewItem()
@@ -96,6 +136,16 @@ namespace Game
             item.transform.SetParent(transform);
             _inGameItems.Add(item);
             return item;
+        }
+
+        private int _blockReadyCount = 0;
+        private void Block_ABlockReady()
+        {
+            /*if (++_blockReadyCount == _allBlocks.Count)
+            {
+                var hint = Hints.FindAHint(_blockArrays);
+                hint.ForEach(x => x.HasItem.ChooseThisItem());
+            }*/
         }
 
         [Button("Regenerate Board")]

@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Id: Parrot
   Img: {fileID: 21300000, guid: f169a2072849a72478aad669aa93839e, type: 3}
+  NextLevel: {fileID: 11400000, guid: 9cab03d78cd8d9046a9446e13959315f, type: 2}

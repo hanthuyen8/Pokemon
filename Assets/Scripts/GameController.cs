@@ -4,30 +4,49 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using Sirenix.OdinInspector;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Game
 {
     public class GameController : MonoBehaviour
     {
         public Board board;
-        private List<Item> PlayerChosenItems = new List<Item>();
+        public float PlayTime { get; private set; }
+        public float LastTimePlayerInterract { get; private set; }
+        private readonly List<Item> PlayerChosenItems = new List<Item>();
 
         private void Awake()
         {
             Assert.IsNotNull(board);
 
-            Item.PlayerChooseThisItem += Item_PlayerChooseThisItem;
+            Item.PlayerWantToChooseThisItem += Item_PlayerWantToChooseThisItem;
             Item.PlayerConfirm += Item_PlayerConfirm;
+        }
+
+        private void Start()
+        {
+            PrepareNewHint();
+        }
+
+        private void Update()
+        {
+            PlayTime += Time.deltaTime;
+            if(PlayTime - LastTimePlayerInterract >= GameSettings.MIN_AMOUNT_OF_TIME_TO_SHOW_HINT)
+            {
+                ShowHint();
+            }
         }
 
         private void OnDestroy()
         {
-            Item.PlayerChooseThisItem -= Item_PlayerChooseThisItem;
+            Item.PlayerWantToChooseThisItem -= Item_PlayerWantToChooseThisItem;
             Item.PlayerConfirm -= Item_PlayerConfirm;
         }
 
-        private void Item_PlayerChooseThisItem(Item item)
+        private void Item_PlayerWantToChooseThisItem(Item item)
         {
+            LastTimePlayerInterract = PlayTime;
+
             int count = PlayerChosenItems.Count;
 
             if (count == 0)
@@ -59,6 +78,7 @@ namespace Game
             void PlayerChooseWrong()
             {
                 Item.ReleaseAll();
+                item.UnChooseThisItem();
                 PlayerChosenItems.ForEach(x => x.UnChooseThisItem());
                 PlayerChosenItems.Clear();
             }
@@ -73,22 +93,37 @@ namespace Game
         private void Item_PlayerConfirm()
         {
             // Gộp tất cả lại thành 1, xóa hết list và tạo ra 1 item mới ngay vị trí của phần tử cuối cùng.
+            if (PlayerChosenItems.Count < GameSettings.MIN_AMOUNT_OF_BLOCKS_TO_COMBINE)
+            {
+                PlayerChosenItems.ForEach(x => x.UnChooseThisItem());
+                ClearList();
+                return;
+            }
+
             var lastIndex = PlayerChosenItems.Count - 1;
             if (lastIndex < 0)
                 return;
 
             var lastItem = PlayerChosenItems[lastIndex];
             lastItem.UnChooseThisItem();
+            if (lastItem.LevelUp())
+            {
+                PlayerChosenItems.RemoveAt(lastIndex);
+            }
 
-            PlayerChosenItems.RemoveAt(lastIndex);
             var emptyBlocks = PlayerChosenItems.ConvertAll(x => x.InsideThisBlock);
 
             PlayerChosenItems.ForEach(x => Destroy(x.gameObject));
-            PlayerChosenItems.Clear();
-
-            Item.ReleaseAll();
-
+            emptyBlocks.ForEach(x => x.RemoveItem());
+            ClearList();
             SendSortedBlocksToSpawnNewItems(emptyBlocks);
+            PrepareNewHint();
+
+            void ClearList()
+            {
+                PlayerChosenItems.Clear();
+                Item.ReleaseAll();
+            }
         }
 
         private bool IsTheSameId(Item item1, Item item2)
@@ -96,14 +131,18 @@ namespace Game
             return item1.Type.Id == item2.Type.Id;
         }
 
-        private bool IsItemsNearBy(Item item1, Item item2)
+        private static bool IsItemsNearBy(Item item1, Item item2)
         {
-            int distance = Mathf.Abs(item1.InsideThisBlock.BlockValue - item2.InsideThisBlock.BlockValue);
+            var block1 = item1.InsideThisBlock;
+            var block2 = item2.InsideThisBlock;
 
-            if (distance > 1)
-                return false;
+            if (block1.AtColumn == block2.AtColumn)
+                return Mathf.Abs(block1.AtRow - block2.AtRow) == 1;
 
-            return true;
+            if (block1.AtRow == block2.AtRow)
+                return Mathf.Abs(block1.AtColumn - block2.AtColumn) == 1;
+
+            return false;
         }
 
         private void SendSortedBlocksToSpawnNewItems(List<Block> blocks)
@@ -121,6 +160,24 @@ namespace Game
                 board.FillTheEmptyBlocks(queue);
             }
         }
+
+        #region Hints
+        private List<Block> _hint;
+
+        private async void PrepareNewHint()
+        {
+            _hint = await Task.Run(() => Hints.FindAHint(Board.Instance.GetArray()));
+        }
+
+        private void ShowHint()
+        {
+            if (_hint != null)
+            {
+                _hint.ForEach(x => x.HasItem.Flash());
+                LastTimePlayerInterract = PlayTime;
+            }
+        }
+        #endregion
     }
 
 }

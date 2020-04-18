@@ -10,6 +10,7 @@ namespace Game
     {
         public string Id;
         public Sprite Img;
+        public ItemType NextLevel;
 
         private void OnValidate()
         {
