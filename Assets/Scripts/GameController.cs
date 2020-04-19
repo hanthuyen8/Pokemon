@@ -81,6 +81,7 @@ namespace Game
                 item.UnChooseThisItem();
                 PlayerChosenItems.ForEach(x => x.UnChooseThisItem());
                 PlayerChosenItems.Clear();
+                ScoreCalculator.Instance.LoseBonus();
             }
 
             void PlayerChooseRight()
@@ -100,7 +101,8 @@ namespace Game
                 return;
             }
 
-            var lastIndex = PlayerChosenItems.Count - 1;
+            var total = PlayerChosenItems.Count;
+            var lastIndex = total - 1;
             if (lastIndex < 0)
                 return;
 
@@ -118,6 +120,7 @@ namespace Game
             ClearList();
             SendSortedBlocksToSpawnNewItems(emptyBlocks);
             PrepareNewHint();
+            ScoreCalculator.Instance.AddScore(total);
 
             void ClearList()
             {
